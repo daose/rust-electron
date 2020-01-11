@@ -1,30 +1,69 @@
 trigger:
 - master
 
-pool:
-  vmImage: 'macOS-latest'
-
-steps:
-- task: NodeTool@0
-  inputs:
-    versionSpec: '12.x'
-  displayName: 'Install Node.js'
-- script: |
-    curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y
-    echo "##vso[task.setvariable variable=PATH;]$PATH:$HOME/.cargo/bin"
-  displayName: 'Install Rust'
-- script: |
-    rustc --version --verbose
-    cargo --version --verbose
-  displayName: 'Print Rust and Cargo Versions'
-- script: |
-    cd electron
-    npm install
-    npm run dist:mac -- --out $(Build.ArtifactStagingDirectory)
-  displayName: 'Build App'
-- task: PublishBuildArtifacts@1
-  displayName: 'Upload Artifact'
-  inputs:
-    PathtoPublish: '$(Build.ArtifactStagingDirectory)'
-    ArtifactName: 'Rust Electron'
-    publishLocation: 'Container'
+stages:
+- stage: macOS
+  displayName: 'macOS'
+  jobs:
+  - job: macOSJob
+    displayName: 'macOS'
+    pool:
+      vmImage: 'macOS-latest'
+    steps:
+    - task: NodeTool@0
+      inputs:
+        versionSpec: '12.x'
+      displayName: 'Install Node.js'
+    - script: |
+        curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y
+        echo "##vso[task.setvariable variable=PATH;]$PATH:$HOME/.cargo/bin"
+      displayName: 'Install Rust'
+    - script: |
+        rustc --version --verbose
+        cargo --version --verbose
+      displayName: 'Print Rust and Cargo Versions'
+    - script: |
+        cd electron
+        npm install
+        npm run dist:mac -- --out $(Build.ArtifactStagingDirectory)
+      displayName: 'Build App'
+    - task: PublishBuildArtifacts@1
+      displayName: 'Upload Artifact'
+      inputs:
+        PathtoPublish: '$(Build.ArtifactStagingDirectory)'
+        ArtifactName: 'Rust Electron'
+        publishLocation: 'Container'
+- stage: windows
+  displayName: 'Windows'
+  # Run in parallel
+  dependsOn: []
+  jobs:
+  - job: windowsJob
+    displayName: 'Windows'
+    pool:
+      vmImage: 'windows-latest'
+    steps:
+    - task: UsePythonVersion@0
+      displayName: 'Switch to Python 2.7'
+      inputs:
+        versionSpec: '2.7' 
+        addToPath: true 
+    - script: |
+        rustc --version --verbose
+        cargo --version --verbose
+        python --version
+      displayName: 'Print Rust/Cargo/Python Versions'
+    - script: |
+        cd electron
+        npm install
+      displayName: 'npm install'
+    - script: |
+        cd electron
+        npm run dist:windows -- --src ./rust-electron-win32-x64 --dest $(Build.ArtifactStagingDirectory)
+      displayName: 'Build App'
+    - task: PublishBuildArtifacts@1
+      displayName: 'Upload Artifact'
+      inputs:
+        PathtoPublish: '$(Build.ArtifactStagingDirectory)'
+        ArtifactName: 'Rust Electron'
+        publishLocation: 'Container'
