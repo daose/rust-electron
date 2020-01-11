@@ -7,6 +7,10 @@
     "build": "electron-build-env neon build neon_bindings --release",
     "prestart": "npm run build",
     "start": "electron .",
+    "predist": "npm run build",
+    "dist": "electron-packager .",
+    "predist:mac": "npm run dist",
+    "dist:mac": "electron-installer-dmg ./rust-electron-darwin-x64/rust-electron.app RustElectron",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "",
@@ -17,6 +21,8 @@
   "devDependencies": {
     "electron": "^7.1.8",
     "electron-build-env": "^0.2.0",
+    "electron-installer-dmg": "^3.0.0",
+    "electron-packager": "^14.1.1",
     "neon-cli": "^0.3.3"
   }
 }
