@@ -4,7 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "build": "electron-build-env neon build neon_bindings --release",
+    "build": "electron-build-env neon build -p ../neon_bindings --release",
     "prestart": "npm run build",
     "start": "electron .",
     "predist": "npm run build",
