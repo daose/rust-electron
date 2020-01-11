@@ -1,7 +1,7 @@
 {
   "name": "rust-electron",
   "version": "1.0.0",
-  "description": "",
+  "description": "Demo of calling Rust from Electron",
   "main": "index.js",
   "scripts": {
     "build": "electron-build-env neon build -p ../neon_bindings --release",
@@ -15,7 +15,7 @@
     "dist:windows": "electron-installer-windows",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
-  "author": "",
+  "author": "daose",
   "license": "ISC",
   "dependencies": {
     "neon_bindings": "file:../neon_bindings"
