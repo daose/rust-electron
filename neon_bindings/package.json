@@ -7,8 +7,5 @@
   "license": "MIT",
   "dependencies": {
     "neon-cli": "^0.3.3"
-  },
-  "scripts": {
-    "install": "neon build"
   }
 }
