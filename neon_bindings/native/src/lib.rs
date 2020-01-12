@@ -4,7 +4,7 @@ extern crate rust_electron;
 
 use neon::prelude::*;
 
-fn hello(mut cx: FunctionContext) -> JsResult<JsString> {
+fn hello_world(mut cx: FunctionContext) -> JsResult<JsString> {
     Ok(cx.string(rust_electron::hello_world()))
 }
 
@@ -27,6 +27,6 @@ fn render_image(mut cx: FunctionContext) -> JsResult<JsArrayBuffer> {
 }
 
 register_module!(mut cx, {
-    cx.export_function("hello", hello)?;
+    cx.export_function("hello_world", hello_world)?;
     cx.export_function("render_image", render_image)
 });
