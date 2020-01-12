@@ -25,7 +25,40 @@ stages:
     - script: |
         cd electron
         npm install
-        npm run dist:mac -- --out $(Build.ArtifactStagingDirectory)
+        npm run dist:mac -- --out $(Build.ArtifactStagingDirectory)/mac
+      displayName: 'Build App'
+    - task: PublishBuildArtifacts@1
+      displayName: 'Upload Artifact'
+      inputs:
+        PathtoPublish: '$(Build.ArtifactStagingDirectory)'
+        ArtifactName: 'Rust Electron'
+        publishLocation: 'Container'
+- stage: linux
+  displayName: 'linux'
+  # Run in parallel
+  dependsOn: []
+  jobs:
+  - job: linuxJob
+    displayName: 'linux'
+    pool:
+      vmImage: 'ubuntu-latest'
+    steps:
+    - task: NodeTool@0
+      inputs:
+        versionSpec: '12.x'
+      displayName: 'Install Node.js'
+    - script: |
+        curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y
+        echo "##vso[task.setvariable variable=PATH;]$PATH:$HOME/.cargo/bin"
+      displayName: 'Install Rust'
+    - script: |
+        rustc --version --verbose
+        cargo --version --verbose
+      displayName: 'Print Rust and Cargo Versions'
+    - script: |
+        cd electron
+        npm install
+        npm run dist -- --out $(Build.ArtifactStagingDirectory)/linux
       displayName: 'Build App'
     - task: PublishBuildArtifacts@1
       displayName: 'Upload Artifact'
@@ -59,7 +92,7 @@ stages:
       displayName: 'npm install'
     - script: |
         cd electron
-        npm run dist:windows -- --src ./rust-electron-win32-x64 --dest $(Build.ArtifactStagingDirectory)
+        npm run dist:windows -- --src ./rust-electron-win32-x64 --dest $(Build.ArtifactStagingDirectory)/windows
       displayName: 'Build App'
     - task: PublishBuildArtifacts@1
       displayName: 'Upload Artifact'
