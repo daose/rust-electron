@@ -35,6 +35,8 @@ stages:
         publishLocation: 'Container'
 - stage: linux
   displayName: 'linux'
+  # Run in parallel
+  dependsOn: []
   jobs:
   - job: linuxJob
     displayName: 'linux'
